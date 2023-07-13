@@ -1,1 +1,86 @@
-<p>Hello.</p>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>RAR to ZIP Converter</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .form-container {
+      margin-bottom: 20px;
+    }
+
+    .form-container input {
+      margin-bottom: 10px;
+    }
+
+    #convert-btn {
+      padding: 10px 20px;
+    }
+
+    #result-container {
+      display: none;
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <h1>RAR to ZIP Converter</h1>
+
+  <div class="form-container">
+    <input type="file" id="rar-file" accept=".rar" />
+    <button id="convert-btn">Convert</button>
+  </div>
+
+  <div id="result-container">
+    <h3>Result:</h3>
+    <p id="result-message"></p>
+    <a id="download-link" href="#" download></a>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.6.0/jszip.min.js"></script>
+  <script>
+    document.getElementById("convert-btn").addEventListener("click", function () {
+      var fileInput = document.getElementById("rar-file");
+      var file = fileInput.files[0];
+
+      if (file) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          var result = e.target.result;
+
+          // Convert RAR to ZIP using JSZip library
+          var zip = new JSZip();
+          zip.loadAsync(result).then(function (zipData) {
+            zip.generateAsync({ type: "blob" }).then(function (zipBlob) {
+              var downloadLink = document.getElementById("download-link");
+              downloadLink.href = URL.createObjectURL(zipBlob);
+              downloadLink.innerHTML = "Download ZIP";
+              downloadLink.style.display = "block";
+
+              document.getElementById("result-message").innerHTML =
+                "Conversion successful!";
+              document.getElementById("result-container").style.display = "block";
+            });
+          }).catch(function () {
+            document.getElementById("result-message").innerHTML =
+              "Conversion failed. Please try again.";
+            document.getElementById("result-container").style.display = "block";
+          });
+        };
+        reader.readAsArrayBuffer(file);
+      }
+    });
+  </script>
+</body>
+</html>
